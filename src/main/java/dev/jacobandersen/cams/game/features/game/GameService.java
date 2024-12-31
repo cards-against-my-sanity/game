@@ -1,6 +1,7 @@
 package dev.jacobandersen.cams.game.features.game;
 
 import dev.jacobandersen.cams.game.config.WsConfig;
+import dev.jacobandersen.cams.game.dto.ChangeGameSettingsDto;
 import dev.jacobandersen.cams.game.error.game.GameNotFoundException;
 import dev.jacobandersen.cams.game.error.game.UserAlreadyInGameException;
 import dev.jacobandersen.cams.game.net.packet.Packet;
@@ -22,6 +23,15 @@ public class GameService {
     public GameService(GameRepository repository, RedisSystemMessagePublisher publisher) {
         this.repository = repository;
         this.publisher = publisher;
+    }
+
+    public boolean isHostOf(UUID userId, UUID gameId) {
+        final Game game = getGame(gameId);
+        if (game == null) {
+            return false;
+        }
+
+        return game.getHostId().equals(userId);
     }
 
     public Game findGameHostedBy(UUID hostId) {
@@ -161,5 +171,86 @@ public class GameService {
 
             repository.delete(game);
         }
+    }
+
+    public void updateGameSettings(final UUID gameId, final ChangeGameSettingsDto dto) {
+        final Game game = getGame(gameId);
+        if (game == null) return;
+
+        final GameSettings settings = game.getSettings();
+
+        dto.maxPlayers().ifPresent(maxPlayers -> {
+            if (maxPlayers < GameConstants.MINIMUM_PLAYERS) {
+                maxPlayers = GameConstants.MINIMUM_PLAYERS;
+            }
+
+            settings.setMaxPlayers(maxPlayers);
+        });
+
+        dto.maxObservers().ifPresent(maxObservers -> {
+            if (maxObservers < 0) {
+                maxObservers = 0;
+            }
+
+            settings.setMaxObservers(maxObservers);
+        });
+
+        dto.maxScore().ifPresent(maxScore -> {
+            if (maxScore < 1) {
+                maxScore = 1;
+            }
+
+            settings.setMaxScore(maxScore);
+        });
+
+        dto.roundIntermissionTimer().ifPresent(roundIntermissionTimer -> {
+            if (roundIntermissionTimer < 0) {
+                roundIntermissionTimer = 0;
+            } else if (roundIntermissionTimer > GameConstants.MAX_TIMER_VALUE) {
+                roundIntermissionTimer = GameConstants.MAX_TIMER_VALUE;
+            }
+
+            settings.setRoundIntermissionTimer(roundIntermissionTimer);
+        });
+
+        dto.gameWinIntermissionTimer().ifPresent(gameWinIntermissionTimer -> {
+            if (gameWinIntermissionTimer < 0) {
+                gameWinIntermissionTimer = 0;
+            } else if (gameWinIntermissionTimer > GameConstants.MAX_TIMER_VALUE) {
+                gameWinIntermissionTimer = GameConstants.MAX_TIMER_VALUE;
+            }
+
+            settings.setGameWinIntermissionTimer(gameWinIntermissionTimer);
+        });
+
+        dto.playingTimer().ifPresent(playingTimer -> {
+            if (playingTimer < 0) {
+                playingTimer = 0;
+            } else if (playingTimer > GameConstants.MAX_TIMER_VALUE) {
+                playingTimer = GameConstants.MAX_TIMER_VALUE;
+            }
+
+            settings.setPlayingTimer(playingTimer);
+        });
+
+        dto.judgingTimer().ifPresent(judgingTimer -> {
+            if (judgingTimer < 0) {
+                judgingTimer = 0;
+            } else if (judgingTimer > GameConstants.MAX_TIMER_VALUE) {
+                judgingTimer = GameConstants.MAX_TIMER_VALUE;
+            }
+
+            settings.setJudgingTimer(judgingTimer);
+        });
+
+        dto.allowPlayersToJoinMidGame().ifPresent(settings::setAllowPlayersToJoinMidGame);
+
+        game.setSettings(settings);
+        repository.save(game);
+
+        publisher.publishMessage(
+                new PacketOutGameSettingsUpdated(gameId, settings),
+                WsConfig.topic("gameBrowser"), WsConfig.gameTopic(gameId)
+        );
     }
 }

@@ -11,11 +11,13 @@ public final class Game {
     @Id
     private UUID id;
     private UUID hostId;
+    private GameSettings settings;
     private Set<Player> players;
     private Set<Observer> observers;
     private GameState state;
 
     public Game() {
+        settings = new GameSettings();
         players = new HashSet<>();
         observers = new HashSet<>();
         state = GameState.LOBBY;
@@ -42,6 +44,14 @@ public final class Game {
 
     public void setHostId(UUID hostId) {
         this.hostId = hostId;
+    }
+
+    public GameSettings getSettings() {
+        return settings;
+    }
+
+    public void setSettings(GameSettings settings) {
+        this.settings = settings;
     }
 
     public Set<Player> getPlayers() {
