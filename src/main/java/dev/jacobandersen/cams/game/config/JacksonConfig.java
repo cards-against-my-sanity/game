@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import dev.jacobandersen.cams.game.net.packet.Packet;
 import dev.jacobandersen.cams.game.net.packet.PacketRegistry;
 import dev.jacobandersen.cams.game.net.packet.PacketDeserializer;
@@ -29,8 +30,10 @@ public class JacksonConfig {
         SimpleModule module = new SimpleModule();
         module.addSerializer(Packet.class, new PacketSerializer());
         module.addDeserializer(Packet.class, new PacketDeserializer(registry));
-
         mapper.registerModule(module);
+
+        // optional support
+        mapper.registerModule(new Jdk8Module());
 
         return mapper;
     }
