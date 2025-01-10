@@ -1,20 +1,27 @@
 package dev.jacobandersen.cams.game.features.deck;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
 public class DeckService {
-    private final DeckRepository repository;
+    private final DeckClient deckClient;
 
-    @Autowired
-    public DeckService(DeckRepository repository) {
-        this.repository = repository;
+    public DeckService(DeckClient deckClient) {
+        this.deckClient = deckClient;
     }
 
-    public Deck getDeck(UUID deckId) {
-        return repository.findById(deckId).orElse(null);
+    public List<Deck> getDecks() {
+        return deckClient.getDecks();
+    }
+
+    public List<DeckWithCards> getDecksWithCards(List<UUID> ids) {
+        return deckClient.getDecksWithCards(ids);
+    }
+
+    public DeckWithCards getDeckWithCards(UUID id) {
+        return deckClient.getDeckWithCards(id);
     }
 }

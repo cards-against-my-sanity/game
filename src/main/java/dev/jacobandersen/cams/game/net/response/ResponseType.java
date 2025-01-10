@@ -5,5 +5,6 @@ public enum ResponseType {
     CREATE_GAME,
     JOIN_GAME,
     LEAVE_GAME,
-    UPDATE_SETTINGS
+    UPDATE_SETTINGS,
+    UPDATE_DECKS
 }

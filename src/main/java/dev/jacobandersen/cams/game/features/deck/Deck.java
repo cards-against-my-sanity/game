@@ -1,10 +1,9 @@
 package dev.jacobandersen.cams.game.features.deck;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.redis.core.RedisHash;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.util.UUID;
 
-@RedisHash("decks")
-public record Deck(@Id UUID id, String name, String description, int weight) {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public record Deck(UUID id, String name, String description) {
 }

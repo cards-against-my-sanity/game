@@ -2,15 +2,20 @@ package dev.jacobandersen.cams.game.features.game;
 
 import dev.jacobandersen.cams.game.config.WsConfig;
 import dev.jacobandersen.cams.game.dto.ChangeGameSettingsDto;
+import dev.jacobandersen.cams.game.dto.UpdateGameDecksDto;
 import dev.jacobandersen.cams.game.error.game.GameNotFoundException;
 import dev.jacobandersen.cams.game.error.game.UserAlreadyInGameException;
+import dev.jacobandersen.cams.game.features.deck.DeckService;
+import dev.jacobandersen.cams.game.features.deck.DeckWithCards;
 import dev.jacobandersen.cams.game.net.packet.Packet;
 import dev.jacobandersen.cams.game.net.packet.out.*;
 import dev.jacobandersen.cams.game.net.redis.RedisSystemMessagePublisher;
 import dev.jacobandersen.cams.game.security.User;
+import org.bouncycastle.util.Pack;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
@@ -18,11 +23,13 @@ import java.util.UUID;
 public class GameService {
     private final GameRepository repository;
     private final RedisSystemMessagePublisher publisher;
+    private final DeckService deckService;
 
     @Autowired
-    public GameService(GameRepository repository, RedisSystemMessagePublisher publisher) {
+    public GameService(GameRepository repository, RedisSystemMessagePublisher publisher, DeckService deckService) {
         this.repository = repository;
         this.publisher = publisher;
+        this.deckService = deckService;
     }
 
     public boolean isHostOf(UUID userId, UUID gameId) {
@@ -250,6 +257,20 @@ public class GameService {
 
         publisher.publishMessage(
                 new PacketOutGameSettingsUpdated(gameId, settings),
+                WsConfig.topic("gameBrowser"), WsConfig.gameTopic(gameId)
+        );
+    }
+
+    public void updateGameDecks(final UUID gameId, final UpdateGameDecksDto dto) {
+        final Game game = getGame(gameId);
+        if (game == null) return;
+
+        List<DeckWithCards> loaded = deckService.getDecksWithCards(dto.deckIds());
+        game.setDecks(new HashSet<>(loaded));
+        repository.save(game);
+
+        publisher.publishMessage(
+                new PacketOutGameDecksUpdated(gameId, loaded),
                 WsConfig.topic("gameBrowser"), WsConfig.gameTopic(gameId)
         );
     }

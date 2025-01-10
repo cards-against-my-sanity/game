@@ -1,5 +1,7 @@
 package dev.jacobandersen.cams.game.features.game;
 
+import dev.jacobandersen.cams.game.features.deck.Deck;
+import dev.jacobandersen.cams.game.features.deck.DeckWithCards;
 import dev.jacobandersen.cams.game.security.User;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
@@ -15,12 +17,14 @@ public final class Game {
     private Set<Player> players;
     private Set<Observer> observers;
     private GameState state;
+    private Set<DeckWithCards> decks;
 
     public Game() {
         settings = new GameSettings();
         players = new HashSet<>();
         observers = new HashSet<>();
         state = GameState.LOBBY;
+        decks = new HashSet<>();
     }
 
     public Game(User host) {
@@ -104,5 +108,13 @@ public final class Game {
 
     public void setState(GameState state) {
         this.state = state;
+    }
+
+    public Set<DeckWithCards> getDecks() {
+        return decks;
+    }
+
+    public void setDecks(Set<DeckWithCards> decks) {
+        this.decks = decks;
     }
 }

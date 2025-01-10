@@ -10,6 +10,7 @@ public enum PacketType {
     GAME_CREATED(PacketOutGameCreated.class),
     GAME_REMOVED(PacketOutGameRemoved.class),
     GAME_SETTINGS_UPDATED(PacketOutGameSettingsUpdated.class),
+    GAME_DECKS_UPDATED(PacketOutGameDecksUpdated.class),
     PLAYER_JOINED_GAME(PacketOutPlayerJoinedGame.class),
     PLAYER_LEFT_GAME(PacketOutPlayerLeftGame.class),
     OBSERVER_JOINED_GAME(PacketOutObserverJoinedGame.class),
