@@ -1,22 +1,21 @@
 package dev.jacobandersen.cams.game.net.packet.out;
 
 import dev.jacobandersen.cams.game.features.deck.Deck;
-import dev.jacobandersen.cams.game.features.deck.DeckWithCards;
 import dev.jacobandersen.cams.game.net.packet.Packet;
 import dev.jacobandersen.cams.game.net.packet.PacketType;
 
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public class PacketOutGameDecksUpdated extends Packet {
     private UUID gameId;
-    private List<DeckWithCards> decks;
+    private Set<Deck> decks;
 
     public PacketOutGameDecksUpdated() {
         super(PacketType.GAME_DECKS_UPDATED);
     }
 
-    public PacketOutGameDecksUpdated(UUID gameId, List<DeckWithCards> decks) {
+    public PacketOutGameDecksUpdated(UUID gameId, Set<Deck> decks) {
         this();
         this.gameId = gameId;
         this.decks = decks;
@@ -30,11 +29,11 @@ public class PacketOutGameDecksUpdated extends Packet {
         this.gameId = gameId;
     }
 
-    public List<DeckWithCards> getDecks() {
+    public Set<Deck> getDecks() {
         return decks;
     }
 
-    public void setDecks(List<DeckWithCards> decks) {
+    public void setDecks(Set<Deck> decks) {
         this.decks = decks;
     }
 }

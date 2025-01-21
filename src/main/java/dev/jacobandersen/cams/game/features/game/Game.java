@@ -1,7 +1,6 @@
 package dev.jacobandersen.cams.game.features.game;
 
 import dev.jacobandersen.cams.game.features.deck.Deck;
-import dev.jacobandersen.cams.game.features.deck.DeckWithCards;
 import dev.jacobandersen.cams.game.security.User;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
@@ -17,7 +16,7 @@ public final class Game {
     private Set<Player> players;
     private Set<Observer> observers;
     private GameState state;
-    private Set<DeckWithCards> decks;
+    private Set<Deck> decks;
 
     public Game() {
         settings = new GameSettings();
@@ -110,11 +109,19 @@ public final class Game {
         this.state = state;
     }
 
-    public Set<DeckWithCards> getDecks() {
+    public Set<Deck> getDecks() {
         return decks;
     }
 
-    public void setDecks(Set<DeckWithCards> decks) {
+    public void addDeck(final Deck deck) {
+        decks.add(deck);
+    }
+
+    public void removeDeck(final UUID deckId) {
+        decks.removeIf(deck -> deck.id().equals(deckId));
+    }
+
+    public void setDecks(Set<Deck> decks) {
         this.decks = decks;
     }
 }

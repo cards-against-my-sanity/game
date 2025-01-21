@@ -57,9 +57,8 @@ public class GameController {
     }
 
     @MessageMapping("/game/leave")
-    public SocketResponse<Void> onLeaveGame(User user) {
+    public void onLeaveGame(User user) {
         gameService.removeUserFromAssociatedGame(user.id());
-        return SocketResponse.ok(ResponseType.LEAVE_GAME, null);
     }
 
     @MessageMapping("/game/{gameId}/updateSettings")

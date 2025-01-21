@@ -262,15 +262,19 @@ public class GameService {
     }
 
     public void updateGameDecks(final UUID gameId, final UpdateGameDecksDto dto) {
-        final Game game = getGame(gameId);
+        Game game = getGame(gameId);
         if (game == null) return;
 
-        List<DeckWithCards> loaded = deckService.getDecksWithCards(dto.deckIds());
-        game.setDecks(new HashSet<>(loaded));
-        repository.save(game);
+        if (dto.active()) {
+            game.addDeck(deckService.getDeck(dto.deckId()));
+        } else {
+            game.removeDeck(dto.deckId());
+        }
+
+        game = repository.save(game);
 
         publisher.publishMessage(
-                new PacketOutGameDecksUpdated(gameId, loaded),
+                new PacketOutGameDecksUpdated(gameId, game.getDecks()),
                 WsConfig.topic("gameBrowser"), WsConfig.gameTopic(gameId)
         );
     }

@@ -17,11 +17,7 @@ public class DeckService {
         return deckClient.getDecks();
     }
 
-    public List<DeckWithCards> getDecksWithCards(List<UUID> ids) {
-        return deckClient.getDecksWithCards(ids);
-    }
-
-    public DeckWithCards getDeckWithCards(UUID id) {
-        return deckClient.getDeckWithCards(id);
+    public Deck getDeck(UUID id) {
+        return deckClient.getDeckById(id);
     }
 }
